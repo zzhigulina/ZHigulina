@@ -1,0 +1,207 @@
+https://crunchify.com/how-to-read-json-object-from-file-in-java/
+https://crunchify.com/how-to-write-json-object-to-file-in-java/
+https://stackabuse.com/reading-and-writing-json-in-java/
+https://www.javatpoint.com/how-to-read-xml-file-in-java
+https://mkyong.com/java/jaxb-hello-world-example/
+
+XSD
+
+https://mkyong.com/maven/how-to-create-a-manifest-file-with-maven/
+
+mylibconv src.xml dst.json
+main(String[] args) {}
+main(String... args) {}
+args[0] = "mylibconv src.xml dst.json"
+args[1] = "src.xml"
+args[2] = "dst.json"
+
+cat src.xml | mylibconv > dst.json
+
+System.in
+System.out
+
+System.err
+System.err.println("...");
+
+
+mylibconv -f src.xml -o dst.json
+cat scr.xml | mylibconv -o dst.json
+mylibconv -f src.xml > dst.json
+
+
+
+<dependency>
+    <groupId>com.googlecode.json-simple</groupId>
+    <artifactId>json-simple</artifactId>
+    <version>1.1.1</version>
+</dependency>
+
+
+http://zetcode.com/java/jaxb/
+https://memorynotfound.com/generate-java-classes-from-xsd/
+https://www.baeldung.com/jaxb
+http://websystique.com/java/jaxb/jaxb-codegeneration-maven-example/
+https://www.mojohaus.org/jaxb2-maven-plugin/Documentation/v2.2/example_xjc_basic.html
+
+https://github.com/tinosteinort/jaxb-examples
+
+pom.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ru.nanotechnology.libs</groupId>
+    <artifactId>mylibconv</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <version.maven-compiler-plugin>3.8.1</version.maven-compiler-plugin>
+        <version.jaxb2-maven-plugin>2.5.0</version.jaxb2-maven-plugin>
+        <version.build-helper-maven-plugin>3.0.0</version.build-helper-maven-plugin>
+        <version.json-simple>1.1.1</version.jaxb-java-time-adapters>
+        <version.jaxb-java-time-adapters>1.1.3</version.jaxb-java-time-adapters>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.migesok</groupId>
+            <artifactId>jaxb-java-time-adapters</artifactId>
+            <version>${version.jaxb-java-time-adapters}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>${version.json-simple}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+
+        <!-- Definition of additional Resource Folder -->
+        <resources>
+            <resource>
+                <directory>src/main/resources-gen</directory>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+
+        <pluginManagement>
+            <plugins>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${version.maven-compiler-plugin}</version>
+                    <configuration>
+                        <release>12</release>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>jaxb2-maven-plugin</artifactId>
+                    <version>${version.jaxb2-maven-plugin}</version>
+                    <executions>
+
+                        <!-- Generate Schema Files from Java Classes -->
+                        <execution>
+                            <id>schemagen</id>
+                            <goals>
+                                <goal>schemagen</goal>
+                            </goals>
+
+                            <configuration>
+
+                                <!-- Define the Files to generate a Schema for -->
+                                <sources>
+                                    <source>src/main/java/ru/nanotechnology/libs/mylibconv/objects/Books.java</source>
+                                    <source>src/main/java/ru/nanotechnology/libs/mylibconv/objects/Journals.java</source>
+                                    <source>src/main/java/ru/nanotechnology/libs/mylibconv/objects/Library.java</source>
+                                </sources>
+
+                                <!-- Namespace to File Mapping -->
+                                <transformSchemas>
+                                    <transformSchema>
+                                        <uri>http://nanotechnology.sfedu.ru/libs/xsd</uri>
+                                        <toPrefix>mylib</toPrefix>
+                                        <toFile>Library.xsd</toFile>
+                                    </transformSchema>
+                                </transformSchemas>
+
+                                <!-- Target Directory for generated Schema Files -->
+                                <outputDirectory>src/main/resources-gen/schemagen</outputDirectory>
+
+                            </configuration>
+                        </execution>
+
+                        <!-- Generate Java Classes from Schema Files -->
+                        <execution>
+                            <id>xjc</id>
+                            <goals>
+                                <goal>xjc</goal>
+                            </goals>
+
+                            <configuration>
+
+                                <!-- Use with Care! Enables JAXB RI Extensions -->
+                                <extension>true</extension>
+
+                                <!-- The Schema to generate Java Classes for -->
+                                <sources>
+                                    <source>src/main/resources/schemas/Library.xsd</source>
+                                </sources>
+
+                                <!-- Binding File for Customisation -->
+                                <xjbSources>
+                                    <xjbSource>src/main/resources/bindings</xjbSource>
+                                </xjbSources>
+
+                                <!-- Define the Target Folder and Package -->
+                                <outputDirectory>src/main/java-gen/</outputDirectory>
+
+                            </configuration>
+                        </execution>
+
+                    </executions>
+                </plugin>
+
+                <!-- Definition of additional Source Folder -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${version.build-helper-maven-plugin}</version>
+                    <executions>
+                        <execution>
+                            <id>add-source</id>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>add-source</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>src/main/java-gen</source>
+                                </sources>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>

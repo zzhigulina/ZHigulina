@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<library>
+	<books>
+		<book>
+			<name>Booktitle</name>
+			<authors>
+				<author>Ivanov, I.I.</author>
+				<author>Petrov, P.P.</author>
+			</authors>
+			<editors>
+				<editor>Ivanov, I.I.</editor>
+				<editor>Petrov, P.P.</editor>
+			</editors>
+			<publisher>Roga &amp; Kopyta Inc.</publisher>
+			<edition>2</edition>
+			<pages>217</pages>
+			<year>2006</year>
+		</book>
+	</books>
+	<journals>
+		<journal>
+			<name>Booktitle</name>
+			<editors>
+				<editor>Ivanov, I.I.</editor>
+				<editor>Petrov, P.P.</editor>
+			</editors>
+			<publisher>Roga &amp; Kopyta Inc.</publisher>
+			<subscription>
+				<edition volume="2" issue="6" date="2019-09-01" />
+				<edition volume="2" issue="5" date="2019-08-01" />
+				<edition volume="2" issue="4" date="2019-07-01" />
+			</subscription>
+		</journal>		
+	<journals>
+</library>
+
+{
+	"books": [
+		{
+			"name": "Booktitle",
+			"authors": ["Ivanov, I.I.", "Petrov, P.P."],
+			"editors": ["Ivanov, I.I.", "Petrov, P.P."],
+		}, {
+			...
+		}
+	]
+	"journals: [
+	]
+}
