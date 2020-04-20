@@ -1,0 +1,211 @@
+1.Ограниченная выборка.
+1.1.Выдать номера поставщиков из Парижа, имеющих состояние больше 20.
+Select номер_поставщика from S номер_поставщика where город='париж' and состояние >20
+
+1.2.Выдать номера и состояние поставщиков, находящихся в Париже, в порядке убывания их состояния.
+Select СОСТОЯНИЕ FROM S WHERE  ГОРОД = "Париж" ORDER BY СОСТОЯНИЕ DESC
+
+1.3.Выдать полный список изделий.
+SELECT НОМЕР_ИЗДЕЛИЯ НАЗВАНИЕ FROM J      select * from J
+
+1.4.Выдать полный список изделий, изготавливаемых в Лондоне.
+select a,b from J where город = "Лондон"
+
+1.5.Выдать упорядоченный список номеров поставщиков, поставляющих детали для изделия J1.
+select номер_поставщика from SPJ where номер_изделия = J1 order by номер_поставщика
+
+1.6.Выдать список всех поставок, в которых количество деталей находится в диапазоне от 300 до 750 включительно.
+select * from SPJ where количество between 300 and 750
+
+1.7.Выдать список всех комбинаций «цвет детали», «город», исключая повторения.
+select distinct цвет, город from P
+
+1.8.Выдать номера поставщиков из Парижа, имеющие состояние больше 20.
+select номер_поставщика from S where ГОРОД = "Париж" and состояние > 20
+
+1.9.Выдать сведения о деталях, вес которых находится в диапазоне от 16 до 19.
+select номер_детали, название, цвет, город from P where вес between 16 and 19
+
+1.10.Выдать сведения о деталях, вес которых равен 12, 16 и 18.
+select номер_детали, название, цвет, город from P where (вес IN (12,16,18))
+
+1.11.Выдать список всех поставок, в котором количество не является неопределенным значением.
+select * from SPJ where количество is not null
+
+2.Выборка с использованием BETWEEN, IN (NOT IN), LIKE, IS NULL (IS NOT NULL). 
+2.1.Выдать сведения о деталях, вес которых находится в диапазоне от 16 до 19. 
+select * from P where вес between 16 and 19
+
+2.2.Выдать детали, вес которых 16, 12 или 17. 
+select номер_детали from P where вес where (вес IN (16,12,17))
+
+2.3.Выдать список всех поставок, в которых количество не является неопределенным значением.
+select * from SPJ where количество is not null
+ 
+2.4.Выдать номера изделий и города, где они изготовляются, такие, что 2-й буквой названия города является «0». 
+select номер_изделия, город from J where LIKE '_O%'
+
+2.5.Выдать все детали, название которых начинается с «Б». 
+select * from P where название LIKE 'Б%'
+
+3.Запросы, использующие соединения. 
+3.1.Выдать все триплеты «номер поставщика», «номер детали», «номер изделия» такие, что образующие каждый из них поставщик, деталь и изделие являются соразмещенными (находятся в одном городе). 
+create view t_3_1 as
+select spj.s, spj.p, spj.j
+from spj
+inner join s on spj.s = s.id
+inner join p on spj.p = p.id
+inner join j on spj.j = j.id
+where 
+s.city = p.city and s.city = j.city
+
+3.2.Выдать все триплеты «номер поставщика», «номер детали», «номер изделия» такие, что образующие каждый из них поставщик, деталь и изделие не являются соразмещенными. 
+create view t_3_2 as
+select spj.s, spj.p, spj.j
+from spj
+inner join s on spj.s = s.id
+inner join p on spj.p = p.id
+inner join j on spj.j = j.id
+where 
+s.city NOT LIKE p.city and s.city NOT LIKE j.city
+
+3.3.Выдать все триплеты «номер поставщика», «номер детали», «номер изделия» такие, что в каждом триплете указанные поставщик, деталь и изделие не являются попарно соразмещенными. 
+create view t_3_3 as
+select spj.s, spj.p, spj.j
+from spj
+inner join s on spj.s = s.id
+inner join p on spj.p = p.id
+inner join j on spj.j = j.id
+where 
+s.city NOT LIKE p.city and s.city NOT LIKE j.city and p.city NOT LIKE j.city
+
+3.4.Выбрать все комбинации информации о таких поставщиках и деталях, которые размещены в одном и том же городе (соразмещены). 
+create view t_3_4 as
+select s.номер_поставщика, состояние, p.номер_детали
+from s
+cross join p
+where s.city = p.city
+
+3.5.Выдать комбинации информации о поставщиках и деталях таких, что город-местонахождение поставщика следует за городом, где хранится деталь в алфавитном порядке. 
+select s.*, p.*
+from s,p
+where s.city > p.city
+
+3.6.Выдать комбинации информации о поставщиках и деталях таких, что рассматриваемые детали и поставки соразмещены. Опустить при этом поставщиков с состоянием = 20. 
+select s.номер_поставщика, p.номер_детали, s.состояние
+from s 
+cross join p
+where s.city = p.city and s.состояние = 20
+
+3.7.Выдать все пары названий городов таких, что какой-либо поставщик, находящийся в первом из этих городов, поставляет некоторую деталь, хранимую во 2-м городе. 
+SELECT DISTINCT S.ГOPOД, Р.ГОРОД
+FROM S, SPJ, P
+WHERE S.HOMEP_ПОСТАВЩИКА = SPJ.HOMEP_ПОСТАВЩИКА
+AND SPJ.HOMEP_ДЕТАЛИ = Р.НОМЕР_ДЕТАЛИ;
+select distinct s.город, p.город
+from s, spj, p
+where s.id = spj.s and spj.p = p.id
+
+3.8.Выдать номера деталей, поставляемых каким-либо поставщиком из Лондона для изделия, изготовляемого также в Лондоне. 
+create view t_3_8 as
+select p.id
+from spj
+inner join s on spj.s = s.id
+inner join p on spj.p = p.id
+where 
+s.city = 'Лондон' and j.city = 'Лондон'
+
+3.9.Выдать номера деталей, поставляемых каким-либо поставщиком из Лондона. 
+create view t_3_9 as
+select p.id
+from spj
+inner join s on spj.s = s.id
+inner join p on spj.p = p.id
+where 
+s.city = 'Лондон' and p.color = j.color
+
+3.10.Выдать все пары названий городов таких, что какой-либо поставщик из 1-го города оставляет детали для некоторого изделия, изготавливаемого во 2-м городе. 
+SELECT S.ГОРОД, J.ГОРОД 
+FROM S, J, SPJ 
+WHERE SPJ.НОМЕР_ПОСТАВЩИКА = S.НОМЕР_ПОСТАВЩИКА AND SPJ.НОМЕР_ИЗДЕЛИЯ = J.НОМЕР_ИЗДЕЛИЯ;
+
+3.11.Выдать все пары номеров деталей таких, что некоторый поставщик поставляет обе указанные детали. 
+SELECT DISTINCT p.НОМЕР_ДЕТАЛИ, spj.НОМЕР_ДЕТАЛИ 
+FROM p, spj 
+WHERE spj.НОМЕР_ПОСТАВЩИКА = s.НОМЕР_ПОСТАВЩИКА AND spj.НОМЕР_ДЕТАЛИ != p.НОМЕР_ДЕТАЛИ
+
+3.8 Выдать номера деталей, поставляемых каким-либо поставщиком из Лондона для изделия, изготовляемого также в Лондоне.
+select detailID from spj
+inner join s on spj.s = s.id
+inner join p on spj.p = p.id
+where s.city = 'Лондон', p.city = 'Лондон'
+
+3.9 Выдать номера деталей, поставляемых каким-либо поставщиком из Лондона
+create view t_3_9 as
+ select destinct p.id
+ from spj
+  inner join s on spj.s = s.id
+  inner join p on spj.p = p.id
+where
+ s.city = 'Лондон'
+
+3.10 Выдать все пары названий городов таких, что какой либо поставщик из 1-го города
+ оставляет детали для некоторого изделия, изготавливаемого во 2-ом городе
+select s.город, j.город from s,j,spj
+wHere spj.providerId=s.providerID and spj.productID=s.productID
+
+3.11 Выдать все пары номеров деталей, таких, что некоторый поставщик поставляет обе указанные детали.
+select distinct p.detailID, spj.detailID from p,spj
+where p.providerID = spj.providerID and p.detailID=spj.detailID
+
+4.1 Выдать фамилии поставщиков, которые поставляют деталь P2.
+create view t_4_1 as
+ select name
+ from s
+ where
+  id in (
+    select s from spj where p in (
+      select id from p where number = 'P2' ))
+
+4.2 Выдать фамилии поставщиков, которые поставляют по крайней мере одну красную деталь
+create view t_4_2 as
+ select distinct name
+ from s
+ where
+  id in (
+    select s from spj where p in (
+      select id from p where color = 'Красный' ))
+5.1 Выдать общее количество поставщиков
+select count(providerID) from s
+
+5.2 Выдать количество поставщиков для детали P2
+select distinct count(providerID) from spj
+where detailID = 'P2'
+
+5.3 Выдать номера поставщиков со значением поля "состояние" меньше, чем текущее максимальное состояние в таблице S.
+select providerID from s
+where 'состояние' < max(состояние)
+
+5.4 Выдать номер поставщика, состояние и город для всех поставщиков, у которых состояние больше или равно среднему для их конкретного города.
+
+6.1 Требуется вычислить общий объём поставок для каждой детали и выдать для нее номер и общий объём поставок
+select distinct detailID, sum(количество)from spj
+group by detailID
+
+6.2 Выдать для каждой поставляемой детали её номер и общий объём поставок за исключение поставок поставщика S1.
+select distinct detailID, sum(количество) from spj
+group by detailID
+where provider =! S1
+
+7.1 Выдать номер детали для всех деталей, поставляемых более, чем одним поставщиком.
+select detailID from spj
+group by detailID
+having count(detailID) > 1
+ 
+7.2 Объединение(UNION))7.3 Выдать номера деталей, которые имеют вес больше 16, либо поставляются поставщиком S2, либо и то, и другое
+select detailID from spj
+inner join p on spj.p =p.id
+where p.weight > 16
+union
+select distinct detailID from spj
+where prividerID = S2
